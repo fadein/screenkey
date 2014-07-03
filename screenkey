@@ -41,7 +41,7 @@ def Main():
     parser.add_option("-n", "--no-hide", action="store_true",
         dest="nohide", default=False, help=_("do not hide"))
     parser.add_option("--bg", action="store",
-        dest="bg", default="black", help=_("background color"))
+        dest="bg", default="black", help=_("background color (in #RRGGBB format)"))
     parser.add_option("--fg", action="store",
         dest="fg", default="white", help=_("foreground color"))
     parser.add_option("--no-sudo", action="store_true",

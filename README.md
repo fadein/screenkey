@@ -1,45 +1,42 @@
 screenkey
 =========
-Screenkey - https://bugs.launchpad.net/screenkey/+bugs
 
-This is screenkey trunk with the following patch:
-https://bugs.launchpad.net/screenkey/+bug/1133068
+Fork of http://launchpad.net/screenkey
 
-No other modifications, kudos to the guys below:
+What's up?
+==========
 
-Screenkey v0.2
-http://launchpad.net/screenkey
+I've made significant changes, including:
 
-About
-=====
-Screencast your keys.
-A screencast tool to display your keys inspired by Screenflick
-and initially based on the key-mon project code.
+* new command line flags:
+  * `-fg` to set font color;
+  * `-bg` to set background color;
+  * `--no-sudo` do not perform check on launched sudo (it's currently VERY slow,
+    because of this check will launch subprocess on EVERY key typed);
+  * `-n, --no-hide` do not hide window after timeout, hide only text (make it
+    usable with tile managers, for example, with i3, which can not have
+    unfocusable windows);
+* instead of removing text on `backspace` just add symbol `⇐`; it was broken
+  anyway, so it will happily erase `Ctrl+...` and other text;
+* space is changed to visible character: `␣`;
+* supported second keyboard layout, so not only ascii letters can be typed;
+* way of detecting modifiers was changed and now based on pure event state
+  field; it's more robust and precise, so, for example, if you remap arrow
+  keys into Mod+[HJKL] (as I do) you get correct output (arrows, not Mod+arrows
+  or something);
+* `Shift+` is now not printed for characters that have two distinct states
+  with and without Shift; it means, that when you type `Shift+q` you will see
+  `Q`. However, if you type `Shift+Left`, you will see `Shift+←`;
+* added another position modifier, and now window can be dragged around to
+  choose optimal position and size; it will remembered and will not change
+  after window hide/show cycle;
+* font size is now binded to window height, so if you resize window you will
+  get different font size;
+* spacing between several keys are tweaked, so they will not nestle to each
+  other, like this: `Ctrl+vhello`; instead, you will see: `Ctrl+v hello`.
 
-Usage
-=====
-Download the latest version from https://launchpad.net/screenkey/+download
-and you need install python-xlib.
-
-To run without installing (change x.x by current version number)
-
-  tar xvfz screenkey-x.x.tar.gz
-  cd screenkey-x.x/
-  sudo ./screenkey
-
-To install
-
-  tar xvfz screenkey-x.x.tar.gz
-  cd screenkey-x.x/
-  sudo ./setup.py install
-
-Or you can use dpkg (Debian and Ubuntu)
-
-  sudo dpkg -i screenkey_x.x-y_all.deb
-
-
-Author
-======
+Original author
+===============
 Pablo Seminario
 
 Thanks to
@@ -64,5 +61,3 @@ GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
-

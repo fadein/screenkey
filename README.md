@@ -35,6 +35,12 @@ I've made significant changes, including:
 * spacing between several keys are tweaked, so they will not nestle to each
   other, like this: `Ctrl+vhello`; instead, you will see: `Ctrl+v hello`.
 
+Preview
+=======
+Some awkward highlights of this features shown here:
+
+![output](https://cloud.githubusercontent.com/assets/674812/3472704/d75e249e-02ce-11e4-90f0-d65b575b1574.gif)
+
 Original author
 ===============
 Pablo Seminario

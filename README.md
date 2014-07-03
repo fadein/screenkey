@@ -16,13 +16,13 @@ I've made significant changes, including:
   * `-n, --no-hide` do not hide window after timeout, hide only text (make it
     usable with tile managers, for example, with i3, which can not have
     unfocusable windows);
-* instead of removing text on `backspace` just add symbol `⇐`; it was broken
-  anyway, so it will happily erase `Ctrl+...` and other text;
+* instead of removing text on `backspace` symbol `⇐` will be added; it was
+  broken anyway, so it will happily erase `Ctrl+...` and other text;
 * space is changed to visible character: `␣`;
-* supported second keyboard layout, so not only ascii letters can be typed;
+* supported second keyboard layout, so not only ASCII letters can be recorded;
 * way of detecting modifiers was changed and now based on pure event state
   field; it's more robust and precise, so, for example, if you remap arrow
-  keys into Mod+[HJKL] (as I do) you get correct output (arrows, not Mod+arrows
+  keys into Mod+\[HJKL\] (as I do) you get correct output (arrows, not Mod+arrows
   or something);
 * `Shift+` is now not printed for characters that have two distinct states
   with and without Shift; it means, that when you type `Shift+q` you will see

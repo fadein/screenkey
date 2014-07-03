@@ -76,7 +76,7 @@ class ListenKbd(threading.Thread):
     # Add in a shortcut to disable
     _disabled = False
 
-    def __init__(self, label, logger, mode):
+    def __init__(self, label, logger, mode, nosudo):
         threading.Thread.__init__(self)
         self.mode = mode
         self.logger = logger
@@ -85,6 +85,7 @@ class ListenKbd(threading.Thread):
         self.command = None
         self.shift = None
         self.prev_key = ''
+        self.nosudo = nosudo
         self.cmd_keys = {
             'shift': False,
             'ctrl': False,
@@ -141,7 +142,7 @@ class ListenKbd(threading.Thread):
         gtk.gdk.threads_enter()
         if not string is None:
             # TODO: make this configurable
-            if string == 'Ctrl+F1  ':
+            if string.strip() == 'Ctrl+F1':
                 if self._disabled:
                     self._disabled=False
                     self.text = "[ENABLED]"
@@ -165,10 +166,11 @@ class ListenKbd(threading.Thread):
         # FIXME:
         # This is not the most efficient way to detect the
         # use of sudo/gksudo but it works.
-        sudo_is_running = subprocess.call(['ps', '-C', 'sudo'],
-                    stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
-        if not sudo_is_running:
-            return
+        if not self.nosudo:
+            sudo_is_running = subprocess.call(['ps', '-C', 'sudo'],
+                        stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+            if not sudo_is_running:
+                return
 
         if reply.category != record.FromServer:
             return

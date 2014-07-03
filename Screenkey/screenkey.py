@@ -58,7 +58,7 @@ class Screenkey(gtk.Window):
     STATE_FILE = os.path.join(glib.get_user_cache_dir(), 
                               'screenkey.dat')
 
-    def __init__(self, logger, nodetach, nohide, bg, fg):
+    def __init__(self, logger, nodetach, nohide, bg, fg, nosudo):
         gtk.Window.__init__(self)
         self.timer = None
         self.logger = logger
@@ -109,8 +109,11 @@ class Screenkey(gtk.Window):
         self.set_gravity(gtk.gdk.GRAVITY_CENTER)
         self.set_xy_position(self.options['position'])
 
+        self.nosudo = nosudo
+
         self.listenkbd = ListenKbd(self.label, logger=self.logger, 
-                                   mode=self.options['mode'])
+                                   mode=self.options['mode'],
+                                   nosudo=self.nosudo)
         self.listenkbd.start()
 
 
@@ -260,14 +263,15 @@ class Screenkey(gtk.Window):
     def on_change_mode(self, mode):
         self.listenkbd.stop()
         self.listenkbd = ListenKbd(self.label, logger=self.logger, 
-                                   mode=mode)
+                                   mode=mode, nosudo=self.nosudo)
         self.listenkbd.start()
 
     def on_show_keys(self, widget, data=None):
         if widget.get_active():
             self.logger.debug("Screenkey enabled.")
             self.listenkbd = ListenKbd(self.label, logger=self.logger, 
-                                       mode=self.options['mode'])
+                                       mode=self.options['mode'],
+                                       nosudo=self.nosudo)
             self.listenkbd.start()
         else:
             self.logger.debug("Screenkey disabled.")

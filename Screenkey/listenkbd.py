@@ -249,6 +249,8 @@ class ListenKbd(threading.Thread):
                     key = key_deadshift
                 if event.detail == 22:
                     key = u'\u21D0'
+                if event.detail == 65:
+                    key = u'\u2423'
 
                 string = self.replace_key(key, keysym)
                 if string:

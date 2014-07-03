@@ -247,6 +247,8 @@ class ListenKbd(threading.Thread):
                     key = key_dead
                 if self.cmd_keys['shift'] and self.cmd_keys['meta']:
                     key = key_deadshift
+                if event.detail == 22:
+                    key = u'\u21D0'
 
                 string = self.replace_key(key, keysym)
                 if string:

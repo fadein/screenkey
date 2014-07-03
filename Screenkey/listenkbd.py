@@ -84,7 +84,7 @@ class ListenKbd(threading.Thread):
         self.text = ""
         self.command = None
         self.shift = None
-        self.prev_key = ''
+        self.detached = False
         self.nosudo = nosudo
         self.cmd_keys = {
             'shift': False,
@@ -257,11 +257,14 @@ class ListenKbd(threading.Thread):
                     key = key_dead
                 if self.cmd_keys['shift'] and self.cmd_keys['meta']:
                     key = key_deadshift
+                if event.detail == 23:
+                    self.detached = True
                 if event.detail == 22:
                     key = u'\u21D0'
                 if event.detail == 65:
                     key = u'\u2423'
                 if event.detail == 66:
+                    self.detached = True
                     key = u'\u2328'
 
                 string = self.replace_xk_key(key, keysym)
@@ -270,10 +273,20 @@ class ListenKbd(threading.Thread):
 
                 if mod != '':
                     key = mod + key
-                prev_key = self.prev_key
-                self.prev_key = key
-                if len(prev_key) > 1 or len(key) > 1:
+
+                detached = self.detached
+                self.detached = False
+                if len(key) > 1:
+                    self.detached = True
+                if event.detail == 66:
+                    self.detached = True
+                if event.detail == 23:
+                    self.detached = True
+
+                if detached or len(key) > 1:
                     key = " " + key
+
+                print(self.detached)
 
                 if event.detail == 65:
                     key += u'\u200A'

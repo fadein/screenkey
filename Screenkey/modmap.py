@@ -84,7 +84,7 @@ def get_keymap_table():
     return keymap
 
 def get_modifier_map():
-    modifiers = {}
+    modifiers = []
 
     modifier_map = cmd_modifier_map()
 
@@ -97,9 +97,8 @@ def get_modifier_map():
                 keycodes = re_line.findall(line)
                 # Convert key codes from hex to dec for use them
                 # with the keymap table
-                keycodes =[ int(kc, 16) for kc in keycodes]
-                
-                modifiers[mod_name] = keycodes
+                for kc in keycodes:
+                    modifiers.append(int(kc, 16))
 
     return modifiers
 

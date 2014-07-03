@@ -210,64 +210,23 @@ class ListenKbd(threading.Thread):
             self.logger.debug('No mapping for scan_code %d' % event.detail)
             return
 
-
-        # Alt key
-        if event.detail in self.modifiers['mod1']:
-            if event.type == X.KeyPress:
-                self.cmd_keys['alt'] = True
+        masks = {
+            1<<0: 'shift',
+            1<<1: 'lock',
+            1<<2: 'ctrl',
+            1<<3: 'alt',
+            1<<4: 'mod2',
+            1<<5: 'mod3',
+            1<<6: 'super',
+            1<<7: 'meta'
+        }
+        for k in masks:
+            if k & event.state:
+                self.cmd_keys[masks[k]] = True
             else:
-                self.cmd_keys['alt'] = False
+                self.cmd_keys[masks[k]] = False
+        if event.detail in self.modifiers:
             return
-        # Meta key
-        # Fixme: it must use self.modifiers['mod5']
-        #        but doesn't work
-        if event.detail == 108:
-            if event.type == X.KeyPress:
-                self.cmd_keys['meta'] = True
-            else:
-                self.cmd_keys['meta'] = False
-            return
-        # Super key
-        if event.detail in self.modifiers['mod4']:
-            if event.type == X.KeyPress:
-                self.cmd_keys['super'] = True
-            else:
-                self.cmd_keys['super'] = False
-            return
-        # Ctrl keys
-        elif event.detail in self.modifiers['control']:
-            if event.type == X.KeyPress:
-                self.cmd_keys['ctrl'] = True
-            else:
-                self.cmd_keys['ctrl'] = False
-            return
-        # Shift keys
-        elif event.detail in self.modifiers['shift']:
-            if event.type == X.KeyPress:
-                self.cmd_keys['shift'] = True
-            else:
-                self.cmd_keys['shift'] = False
-            return
-        # Capslock key
-        elif event.detail in self.modifiers['lock']:
-            if event.type == X.KeyPress:
-                if self.cmd_keys['capslock']:
-                    self.cmd_keys['capslock'] = False
-                else:
-                    self.cmd_keys['capslock'] = True
-            return
-        # Backspace key
-        elif event.detail == 22 and event.type == X.KeyPress:
-            gtk.gdk.threads_enter()
-            if len(self.label.get_text()) > 0:
-                self.label.set_text(
-                    unicode(self.label.get_text(), 'utf-8')[:-1]
-                )
-                key = ""
-                gtk.gdk.threads_leave()
-            else:
-                gtk.gdk.threads_leave()
-                return
         else:
             if event.type == X.KeyPress:
                 key = key_normal

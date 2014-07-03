@@ -28,6 +28,7 @@ from listenkbd import ListenKbd
 POS_TOP = 0
 POS_CENTER = 1
 POS_BOTTOM = 2
+POS_KEEP = 3
 
 SIZE_LARGE = 0
 SIZE_MEDIUM = 1
@@ -42,6 +43,7 @@ class Screenkey(gtk.Window):
         POS_TOP:_('Top'),
         POS_CENTER:_('Center'),
         POS_BOTTOM:_('Bottom'),
+        POS_KEEP:_('Keep'),
     }
     SIZES = {
         SIZE_LARGE:_('Large'),
@@ -56,9 +58,8 @@ class Screenkey(gtk.Window):
     STATE_FILE = os.path.join(glib.get_user_cache_dir(), 
                               'screenkey.dat')
 
-    def __init__(self, logger, nodetach):
+    def __init__(self, logger, nodetach, nohide, bg, fg):
         gtk.Window.__init__(self)
-
         self.timer = None
         self.logger = logger
 
@@ -66,7 +67,7 @@ class Screenkey(gtk.Window):
         if not self.options:
             self.options = {
                 'timeout': 2.5,
-                'position': POS_BOTTOM,
+                'position': POS_KEEP,
                 'size': SIZE_MEDIUM,
                 'mode': MODE_NORMAL,
                 }
@@ -83,9 +84,14 @@ class Screenkey(gtk.Window):
         self.set_property('accept-focus', False)
         self.set_property('focus-on-map', False)
         self.set_position(gtk.WIN_POS_CENTER)
-        bgcolor = gtk.gdk.color_parse("black")
+        bgcolor = gtk.gdk.color_parse(bg)
         self.modify_bg(gtk.STATE_NORMAL, bgcolor)
         self.set_opacity(0.7)
+
+        self.fg = fg
+
+        self.pos_x = 0
+        self.pos_y = 0
 
         gobject.signal_new("text-changed", gtk.Label, 
                         gobject.SIGNAL_RUN_FIRST, gobject.TYPE_NONE, ())
@@ -157,11 +163,19 @@ class Screenkey(gtk.Window):
             self.logger.debug("Using StatusIcon.")
 
 
+        self.connect("destroy-event", self.quit)
         self.connect("delete-event", self.quit)
+        self.connect("configure-event", self.on_configure)
+
+        self.no_hide = nohide
+        if nohide:
+            self.show()
 
     def quit(self, widget, data=None):
-        self.listenkbd.stop()
-        gtk.main_quit()
+        try:
+            self.listenkbd.stop()
+        finally:
+            gtk.main_quit()
 
     def load_state(self):
         """Load stored options"""
@@ -202,14 +216,6 @@ class Screenkey(gtk.Window):
         if setting == SIZE_SMALL:
             window_height = 8 * self.screen_height / 100
 
-        attr = pango.AttrList()
-        attr.change(pango.AttrSize((
-                    50 * window_height / 100) * 1000, 0, -1))
-        attr.change(pango.AttrFamily("Sans", 0, -1))
-        attr.change(pango.AttrWeight(pango.WEIGHT_BOLD, 0, -1))
-        attr.change(pango.AttrForeground(65535, 65535, 65535, 0, -1))
-
-        self.label.set_attributes(attr)
         self.resize(window_width, window_height)
 
     def set_xy_position(self, setting):
@@ -221,6 +227,8 @@ class Screenkey(gtk.Window):
             self.move(0, self.screen_height / 2)
         if setting == POS_BOTTOM:
             self.move(0, self.screen_height - window_height * 2)
+        if setting == POS_KEEP:
+            self.move(self.pos_x, self.pos_y)
 
     def on_statusicon_popup(self, widget, button, timestamp, data=None):
         if button == 3:
@@ -244,7 +252,8 @@ class Screenkey(gtk.Window):
 
     def on_timeout(self):
         gtk.gdk.threads_enter()
-        self.hide()
+        if not self.no_hide:
+            self.hide()
         self.label.set_text("")
         gtk.gdk.threads_leave()
 
@@ -263,6 +272,28 @@ class Screenkey(gtk.Window):
         else:
             self.logger.debug("Screenkey disabled.")
             self.listenkbd.stop()
+
+    def on_configure(self, _, event):
+        window_height = event.height
+        attr = pango.AttrList()
+        attr.change(pango.AttrSize((
+                    50 * window_height / 100) * 1000, 0, -1))
+        attr.change(pango.AttrFamily("Sans", 0, -1))
+        attr.change(pango.AttrWeight(pango.WEIGHT_BOLD, 0, -1))
+
+        fgcolor = gtk.gdk.color_parse(self.fg)
+        attr.change(pango.AttrForeground(fgcolor.red, fgcolor.green, fgcolor.blue, 0, -1))
+
+        self.pos_x = event.x
+        self.pos_y = event.y
+
+        if self.timer:
+            self.timer.cancel()
+
+        self.timer = Timer(self.options['timeout'], self.on_timeout)
+        self.timer.start()
+
+        self.label.set_attributes(attr)
 
     def on_preferences_dialog(self, widget, data=None):
         prefs = gtk.Dialog(APP_NAME, None, 

@@ -21,6 +21,7 @@ pygtk.require('2.0')
 import gtk
 import gettext
 import locale
+import threading
 
 locale.setlocale(locale.LC_ALL, '')
 gettext.install('screenkey', unicode=True)
@@ -37,6 +38,12 @@ def Main():
         help=_("do not detach from the parent"))
     parser.add_option("-d", "--debug", action="store_true", 
         dest="debug", default=False, help=_("show debug information"))
+    parser.add_option("-n", "--no-hide", action="store_true",
+        dest="nohide", default=False, help=_("do not hide"))
+    parser.add_option("--bg", action="store",
+        dest="bg", default="black", help=_("background color"))
+    parser.add_option("--fg", action="store",
+        dest="fg", default="white", help=_("foreground color"))
     (options, args) = parser.parse_args()
 
     if options.debug:
@@ -56,9 +63,15 @@ def Main():
         logging.basicConfig(level=logging.INFO)
     logger = logging.getLogger(APP_NAME)
 
-    s = Screenkey(logger=logger, nodetach=options.nodetach)
-    gtk.main()
-
+    s = Screenkey(logger=logger, nodetach=options.nodetach,
+        nohide=options.nohide,
+        bg=options.bg, fg=options.fg)
+    try:
+        gtk.main()
+    finally:
+        # listenkbd thread do not terminate due to bug in Xlib implementation
+        if threading.active_count() > 1:
+            os.system('kill %d' % (os.getpid()))
 
 if __name__ == "__main__":
     Main()

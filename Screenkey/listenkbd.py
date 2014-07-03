@@ -29,7 +29,7 @@ REPLACE_KEYS = {
     'XK_Escape':_('Esc'),
     'XK_Tab':u'\u21B9',
     'XK_Return':u'\u23CE',
-    'XK_Space':u' ',
+    'XK_Space':u'',
     'XK_Caps_Lock':_('Caps'),
     'XK_F1':u'F1',
     'XK_F2':u'F2',
@@ -132,7 +132,7 @@ class ListenKbd(threading.Thread):
                 return name[3:]
         return ""
 
-    def replace_key(self, key, keysym):
+    def replace_xk_key(self, key, keysym):
         for name in dir(XK):
             if name[:3] == "XK_" and getattr(XK, name) == keysym:
                 if name in REPLACE_KEYS:
@@ -201,8 +201,15 @@ class ListenKbd(threading.Thread):
         keysym = self.local_dpy.keycode_to_keysym(event.detail, 0)
 
         if event.detail in self.keymap:
-            key_normal, key_shift, key_dead, key_deadshift = \
-                                            self.keymap[event.detail]
+            key_normal_1, key_shift_1, \
+            key_normal_2, key_shift_2, \
+            key_dead, key_deadshift = self.keymap[event.detail]
+            if event.state & 1 << 13 != 0:
+                key_normal = key_normal_2
+                key_shift = key_shift_2
+            else:
+                key_normal = key_normal_1
+                key_shift = key_shift_1
             self.logger.debug("Key %s(keycode) %s. Symbols %s" %
                 (event.detail,
                  event.type == X.KeyPress and "pressed" or "released",
@@ -240,7 +247,8 @@ class ListenKbd(threading.Thread):
                     mod = mod + _("Super+")
 
                 if self.cmd_keys['shift']:
-                    mod = mod + _("Shift+")
+                    if key_shift == key_normal or key_normal == u'\x00' or key_shift == u'\x00':
+                        mod = mod + _("Shift+")
                     key = key_shift
                 if self.cmd_keys['capslock'] \
                     and ord(key_normal) in range(97,123):
@@ -253,8 +261,10 @@ class ListenKbd(threading.Thread):
                     key = u'\u21D0'
                 if event.detail == 65:
                     key = u'\u2423'
+                if event.detail == 66:
+                    key = u'\u2328'
 
-                string = self.replace_key(key, keysym)
+                string = self.replace_xk_key(key, keysym)
                 if string:
                     key = string
 
@@ -264,6 +274,9 @@ class ListenKbd(threading.Thread):
                 self.prev_key = key
                 if len(prev_key) > 1 or len(key) > 1:
                     key = " " + key
+
+                if event.detail == 65:
+                    key += u'\u200A'
             else:
                 return
 

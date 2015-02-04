@@ -13,6 +13,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import os
+import re
 import pygtk
 pygtk.require('2.0')
 import gtk
@@ -24,6 +25,7 @@ from threading import Timer
 
 from Screenkey import APP_NAME, APP_DESC, APP_URL, VERSION, AUTHOR
 from listenkbd import ListenKbd
+from subprocess import Popen, PIPE, check_call, STDOUT
 
 POS_TOP = 0
 POS_CENTER = 1
@@ -58,7 +60,7 @@ class Screenkey(gtk.Window):
     STATE_FILE = os.path.join(glib.get_user_cache_dir(), 
                               'screenkey.dat')
 
-    def __init__(self, logger, nodetach, nohide, bg, fg, nosudo):
+    def __init__(self, logger, nodetach, nohide, bg, fg, nosudo, window_id):
         gtk.Window.__init__(self)
         self.timer = None
         self.logger = logger
@@ -67,8 +69,8 @@ class Screenkey(gtk.Window):
         if not self.options:
             self.options = {
                 'timeout': 2.5,
-                'position': POS_KEEP,
-                'size': SIZE_MEDIUM,
+                'position': POS_BOTTOM,
+                'size': SIZE_SMALL,
                 'mode': MODE_NORMAL,
                 }
 
@@ -104,10 +106,20 @@ class Screenkey(gtk.Window):
 
         self.screen_width = gtk.gdk.screen_width()   
         self.screen_height = gtk.gdk.screen_height() 
-        self.set_window_size(self.options['size'])
 
         self.set_gravity(gtk.gdk.GRAVITY_CENTER)
-        self.set_xy_position(self.options['position'])
+
+        if window_id == 0:
+            self.set_xy_position(self.options['position'])
+            self.set_window_size(self.options['size'])
+        else:
+            other_win_pos = self.get_window_pos(window_id)
+
+            window_width, window_height = self.set_window_size_of_other_win(
+                    other_win_pos, self.options['size'])
+
+            self.set_xy_position_of_other_win(other_win_pos, self.options['position'], 
+                    window_width, window_height)
 
         self.nosudo = nosudo
 
@@ -207,6 +219,21 @@ class Screenkey(gtk.Window):
         except IOError:
             self.logger.debug("Cannot open %s." % self.STATE_FILE)
 
+    def set_window_size_of_other_win(self, window_pos, setting):
+        """Set window and label size."""
+        window_width = int(window_pos['width'] * 0.8)
+        window_height = -1
+
+        if setting == SIZE_LARGE:
+            window_height = 24 * self.screen_height / 100
+        if setting == SIZE_MEDIUM:
+            window_height = 12 * self.screen_height / 100
+        if setting == SIZE_SMALL:
+            window_height = 1 * self.screen_height / 100
+
+        self.resize(window_width, window_height)
+        return window_width, window_height
+
     def set_window_size(self, setting):
         """Set window and label size."""
         window_width = self.screen_width
@@ -220,6 +247,33 @@ class Screenkey(gtk.Window):
             window_height = 8 * self.screen_height / 100
 
         self.resize(window_width, window_height)
+
+    def get_window_pos(self, win_id):
+        """ get window position x,y and size width, height" """
+        p = Popen(["xwininfo", "-id", win_id], stdout=PIPE)
+        out = p.communicate()[0]
+        #if p.returncode != 0:
+        x = int(re.search("Absolute upper-left X:.*?(\d+)", out).groups()[0])
+        y = int(re.search("Absolute upper-left Y:.*?(\d+)", out).groups()[0])
+        width = int(re.search("Width:.*?(\d+)", out).groups()[0])
+        height = int(re.search("Height:.*?(\d+)", out).groups()[0])
+
+        return {'x': x, 'y': y, 'width': width, 'height': height}
+
+    def set_xy_position_of_other_win(self, window_pos, setting,
+            window_width, window_height):
+        """Set window position."""
+
+        if setting == POS_TOP:
+            self.move(0, window_pos['height'] * 2)
+        if setting == POS_CENTER:
+            self.move(0, self.screen_height / 2)
+        if setting == POS_BOTTOM:
+            self.move(window_pos['x']+window_pos['width']-window_width, 
+                    int(window_pos['y'] + window_pos['height'] - \
+                            window_height*5 - window_pos['height']*0.05))
+        if setting == POS_KEEP:
+            self.move(self.pos_x, self.pos_y)
 
     def set_xy_position(self, setting):
         """Set window position."""

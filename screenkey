@@ -45,7 +45,10 @@ def Main():
     parser.add_option("--fg", action="store",
         dest="fg", default="white", help=_("foreground color"))
     parser.add_option("--no-sudo", action="store_true",
-        dest="nosudo", default="white", help=_("do not perform very expensive sudo running check"))
+        dest="nosudo", default="white",
+        help=_("do not perform very expensive sudo running check"))
+    parser.add_option("-w", "--window",
+        dest="window_id", default=0, help=_("align to other window"))
     (options, args) = parser.parse_args()
 
     if options.debug:
@@ -68,7 +71,8 @@ def Main():
     s = Screenkey(logger=logger, nodetach=options.nodetach,
         nohide=options.nohide,
         bg=options.bg, fg=options.fg,
-        nosudo=options.nosudo)
+        nosudo=options.nosudo,
+        window_id=options.window_id)
     try:
         gtk.main()
     finally:

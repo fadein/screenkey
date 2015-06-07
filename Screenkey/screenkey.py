@@ -229,7 +229,7 @@ class Screenkey(gtk.Window):
         if setting == SIZE_MEDIUM:
             window_height = 12 * self.screen_height / 100
         if setting == SIZE_SMALL:
-            window_height = 1 * self.screen_height / 100
+            window_height = 3 * self.screen_height / 100
 
         self.resize(window_width, window_height)
         return window_width, window_height
@@ -336,7 +336,7 @@ class Screenkey(gtk.Window):
         attr = pango.AttrList()
         attr.change(pango.AttrSize((
                     50 * window_height / 100) * 1000, 0, -1))
-        attr.change(pango.AttrFamily("Sans", 0, -1))
+        attr.change(pango.AttrFamily("DejaVu Sans", 0, -1))
         attr.change(pango.AttrWeight(pango.WEIGHT_BOLD, 0, -1))
 
         fgcolor = gtk.gdk.color_parse(self.fg)

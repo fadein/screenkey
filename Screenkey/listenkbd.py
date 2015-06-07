@@ -52,6 +52,7 @@ REPLACE_KEYS = {
     'XK_Down':u'\u2193',
     'XK_Next':_('PgDn'),
     'XK_Insert':_('Ins'),
+    'XK_BackSpace':_(u'\u21d0'),
     'XK_Delete':_('Del'),
     'XK_KP_Home':u'(7)',
     'XK_KP_Up':u'(8)',
@@ -285,8 +286,6 @@ class ListenKbd(threading.Thread):
 
                 if detached or len(key) > 1:
                     key = " " + key
-
-                print(self.detached)
 
                 if event.detail == 65:
                     key += u'\u200A'

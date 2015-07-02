@@ -45,7 +45,7 @@ def get_keymap_table():
                         keysym = '0x0'
                     new_keysyms.append(keysym_to_unicode(int(keysym, 16)))
 
-    		keymap[keycode] = new_keysyms
+                keymap[keycode] = new_keysyms
 
     return keymap
 

@@ -144,7 +144,7 @@ class ListenKbd(threading.Thread):
 
     def update_text(self, string=None):
         gtk.gdk.threads_enter()
-        if not string is None:
+        if string is not None:
             # TODO: make this configurable
             if string.strip() == 'Ctrl+F1':
                 if self._disabled:

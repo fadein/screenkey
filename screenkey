@@ -51,7 +51,7 @@ def main():
         dest="fg", default="white", help=_("foreground color"))
     parser.add_option(
         "--no-sudo", action="store_true",
-        dest="nosudo", default="white",
+        dest="nosudo", default=True,
         help=_("do not perform very expensive sudo running check"))
     parser.add_option(
         "-w", "--window",

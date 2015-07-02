@@ -167,15 +167,14 @@ class ListenKbd(threading.Thread):
             self.label.emit("text-changed")
 
     def key_press(self, reply):
-
         # FIXME:
         # This is not the most efficient way to detect the
         # use of sudo/gksudo but it works.
         if not self.nosudo:
-            sudo_is_running = subprocess.call(
+            sudo_is_running = 0 == subprocess.call(
                 ['ps', '-C', 'sudo'],
                 stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
-            if not sudo_is_running:
+            if sudo_is_running:
                 return
 
         if reply.category != record.FromServer:

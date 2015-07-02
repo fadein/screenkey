@@ -500,8 +500,7 @@ class Screenkey(gtk.Window):
         about.destroy()
 
     def drop_tty(self):
-        # We fork and setsid so that we drop the controlling
-        # tty.
+        # We fork and setsid so that we drop the controlling tty.
         if os.fork() != 0:
             os._exit(0)
 

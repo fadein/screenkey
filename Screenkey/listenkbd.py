@@ -134,9 +134,9 @@ class ListenKbd(threading.Thread):
         return ""
 
     def replace_xk_key(self, key, keysym):
-        if key == '\x00':
-            return ''
         print(key, keysym)
+        if key == u'\x00' or key == '\x00':
+            return ''
         for name in dir(XK):
             if name[:3] == "XK_" and getattr(XK, name) == keysym:
                 if name in REPLACE_KEYS:
@@ -275,7 +275,7 @@ class ListenKbd(threading.Thread):
                     key = u'\u2623'
 
                 string = self.replace_xk_key(key, keysym)
-                if string:
+                if string is not None:
                     key = string
 
                 if mod != '':

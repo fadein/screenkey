@@ -72,7 +72,10 @@ def keysym_to_unicode(keysym):
     if keysym in mapping:
         return unichr(mapping[keysym])
     else:
-        return unichr(keysym)
+        try:
+            return unichr(keysym)
+        except ValueError:
+            return u'\x00'
 
 mapping = {
     0x01a1: 0x0104,

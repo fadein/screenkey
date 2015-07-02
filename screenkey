@@ -29,25 +29,32 @@ gettext.install('screenkey', unicode=True)
 from Screenkey import APP_NAME, APP_DESC, VERSION
 from Screenkey.screenkey import Screenkey
 
-gtk.gdk.threads_init()
 
-def Main():
+def main():
     parser = OptionParser(description=APP_DESC, version=VERSION)
-    parser.add_option("--no-detach", action="store_true",
-        dest="nodetach", default=False,
+    parser.add_option(
+        "--no-detach", action="store_true",
+        dest="nodetach", default=True,
         help=_("do not detach from the parent"))
-    parser.add_option("-d", "--debug", action="store_true",
+    parser.add_option(
+        "-d", "--debug", action="store_true",
         dest="debug", default=False, help=_("show debug information"))
-    parser.add_option("-n", "--no-hide", action="store_true",
+    parser.add_option(
+        "-n", "--no-hide", action="store_true",
         dest="nohide", default=False, help=_("do not hide"))
-    parser.add_option("--bg", action="store",
-        dest="bg", default="black", help=_("background color (in #RRGGBB format)"))
-    parser.add_option("--fg", action="store",
+    parser.add_option(
+        "--bg", action="store",
+        dest="bg", default="black",
+        help=_("background color (in #RRGGBB format)"))
+    parser.add_option(
+        "--fg", action="store",
         dest="fg", default="white", help=_("foreground color"))
-    parser.add_option("--no-sudo", action="store_true",
+    parser.add_option(
+        "--no-sudo", action="store_true",
         dest="nosudo", default="white",
         help=_("do not perform very expensive sudo running check"))
-    parser.add_option("-w", "--window",
+    parser.add_option(
+        "-w", "--window",
         dest="window_id", default=0, help=_("align to other window"))
     (options, args) = parser.parse_args()
 
@@ -68,7 +75,11 @@ def Main():
         logging.basicConfig(level=logging.INFO)
     logger = logging.getLogger(APP_NAME)
 
-    s = Screenkey(logger=logger, nodetach=options.nodetach,
+    gtk.gdk.threads_init()
+
+    s = Screenkey(
+        logger=logger,
+        nodetach=options.nodetach,
         nohide=options.nohide,
         bg=options.bg, fg=options.fg,
         nosudo=options.nosudo,
@@ -81,5 +92,4 @@ def Main():
             os.system('kill %d' % (os.getpid()))
 
 if __name__ == "__main__":
-    Main()
-
+    main()

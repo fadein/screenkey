@@ -39,22 +39,23 @@ SIZE_SMALL = 2
 MODE_RAW = 0
 MODE_NORMAL = 1
 
+
 class Screenkey(gtk.Window):
 
     POSITIONS = {
-        POS_TOP:_('Top'),
-        POS_CENTER:_('Center'),
-        POS_BOTTOM:_('Bottom'),
-        POS_KEEP:_('Keep'),
+        POS_TOP: _('Top'),
+        POS_CENTER: _('Center'),
+        POS_BOTTOM: _('Bottom'),
+        POS_KEEP: _('Keep'),
     }
     SIZES = {
-        SIZE_LARGE:_('Large'),
-        SIZE_MEDIUM:_('Medium'),
-        SIZE_SMALL:_('Small'),
+        SIZE_LARGE: _('Large'),
+        SIZE_MEDIUM: _('Medium'),
+        SIZE_SMALL: _('Small'),
     }
     MODES = {
-        MODE_RAW:_('Raw'),
-        MODE_NORMAL:_('Normal'),
+        MODE_RAW: _('Raw'),
+        MODE_NORMAL: _('Normal'),
     }
 
     STATE_FILE = os.path.join(glib.get_user_cache_dir(),
@@ -96,7 +97,7 @@ class Screenkey(gtk.Window):
         self.pos_y = 0
 
         gobject.signal_new("text-changed", gtk.Label,
-                        gobject.SIGNAL_RUN_FIRST, gobject.TYPE_NONE, ())
+                           gobject.SIGNAL_RUN_FIRST, gobject.TYPE_NONE, ())
         self.label = gtk.Label()
         self.label.set_justify(gtk.JUSTIFY_RIGHT)
         self.label.set_ellipsize(pango.ELLIPSIZE_START)
@@ -116,10 +117,11 @@ class Screenkey(gtk.Window):
             other_win_pos = self.get_window_pos(window_id)
 
             window_width, window_height = self.set_window_size_of_other_win(
-                    other_win_pos, self.options['size'])
+                other_win_pos, self.options['size'])
 
-            self.set_xy_position_of_other_win(other_win_pos, self.options['position'],
-                    window_width, window_height)
+            self.set_xy_position_of_other_win(
+                other_win_pos, self.options['position'],
+                window_width, window_height)
 
         self.nosudo = nosudo
 
@@ -127,7 +129,6 @@ class Screenkey(gtk.Window):
                                    mode=self.options['mode'],
                                    nosudo=self.nosudo)
         self.listenkbd.start()
-
 
         menu = gtk.Menu()
 
@@ -141,7 +142,6 @@ class Screenkey(gtk.Window):
         preferences_item.connect("activate", self.on_preferences_dialog)
         preferences_item.show()
         menu.append(preferences_item)
-
 
         about_item = gtk.ImageMenuItem(gtk.STOCK_ABOUT)
         about_item.connect("activate", self.on_about_dialog)
@@ -160,23 +160,22 @@ class Screenkey(gtk.Window):
 
         try:
             import appindicator
-            self.systray = appindicator.Indicator(APP_NAME,
-                           'indicator-messages',
-                            appindicator.CATEGORY_APPLICATION_STATUS)
+            self.systray = appindicator.Indicator(
+                APP_NAME,
+                'indicator-messages',
+                appindicator.CATEGORY_APPLICATION_STATUS)
             self.systray.set_status(appindicator.STATUS_ACTIVE)
             self.systray.set_attention_icon("indicator-messages-new")
-            self.systray.set_icon(
-                    "preferences-desktop-keyboard-shortcuts")
+            self.systray.set_icon("preferences-desktop-keyboard-shortcuts")
             self.systray.set_menu(menu)
             self.logger.debug("Using AppIndicator.")
-        except(ImportError):
+        except ImportError:
             self.systray = gtk.StatusIcon()
             self.systray.set_from_icon_name(
-                    "preferences-desktop-keyboard-shortcuts")
+                "preferences-desktop-keyboard-shortcuts")
             self.systray.connect("popup-menu",
-                    self.on_statusicon_popup, menu)
+                                 self.on_statusicon_popup, menu)
             self.logger.debug("Using StatusIcon.")
-
 
         self.connect("destroy-event", self.quit)
         self.connect("delete-event", self.quit)
@@ -252,7 +251,7 @@ class Screenkey(gtk.Window):
         """ get window position x,y and size width, height" """
         p = Popen(["xwininfo", "-id", win_id], stdout=PIPE)
         out = p.communicate()[0]
-        #if p.returncode != 0:
+        # if p.returncode != 0:
         x = int(re.search("Absolute upper-left X:.*?(\d+)", out).groups()[0])
         y = int(re.search("Absolute upper-left Y:.*?(\d+)", out).groups()[0])
         width = int(re.search("Width:.*?(\d+)", out).groups()[0])
@@ -261,7 +260,7 @@ class Screenkey(gtk.Window):
         return {'x': x, 'y': y, 'width': width, 'height': height}
 
     def set_xy_position_of_other_win(self, window_pos, setting,
-            window_width, window_height):
+                                     window_width, window_height):
         """Set window position."""
 
         if setting == POS_TOP:
@@ -270,8 +269,8 @@ class Screenkey(gtk.Window):
             self.move(0, self.screen_height / 2)
         if setting == POS_BOTTOM:
             self.move(window_pos['x']+window_pos['width']-window_width,
-                    int(window_pos['y'] + window_pos['height'] - \
-                            window_height*5 - window_pos['height']*0.05))
+                      int(window_pos['y'] + window_pos['height'] -
+                          window_height*5 - window_pos['height']*0.05))
         if setting == POS_KEEP:
             self.move(self.pos_x, self.pos_y)
 
@@ -340,7 +339,8 @@ class Screenkey(gtk.Window):
         attr.change(pango.AttrWeight(pango.WEIGHT_BOLD, 0, -1))
 
         fgcolor = gtk.gdk.color_parse(self.fg)
-        attr.change(pango.AttrForeground(fgcolor.red, fgcolor.green, fgcolor.blue, 0, -1))
+        attr.change(pango.AttrForeground(
+            fgcolor.red, fgcolor.green, fgcolor.blue, 0, -1))
 
         self.pos_x = event.x
         self.pos_y = event.y
@@ -355,8 +355,8 @@ class Screenkey(gtk.Window):
 
     def on_preferences_dialog(self, widget, data=None):
         prefs = gtk.Dialog(APP_NAME, None,
-                    gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT,
-                    (gtk.STOCK_CLOSE, gtk.RESPONSE_CLOSE))
+                           gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT,
+                           (gtk.STOCK_CLOSE, gtk.RESPONSE_CLOSE))
 
         def on_sb_time_changed(widget, data=None):
             self.options['timeout'] = widget.get_value()
@@ -491,13 +491,11 @@ class Screenkey(gtk.Window):
         about.set_copyright(u"2010 \u00a9 %s" % AUTHOR)
         about.set_comments(APP_DESC)
         about.set_documenters(
-                [u"Jos\xe9 Mar\xeda Quiroga <pepelandia@gmail.com>"]
+            [u"Jos\xe9 Mar\xeda Quiroga <pepelandia@gmail.com>"]
         )
         about.set_website(APP_URL)
         about.set_icon_name('preferences-desktop-keyboard-shortcuts')
-        about.set_logo_icon_name(
-                'preferences-desktop-keyboard-shortcuts'
-        )
+        about.set_logo_icon_name('preferences-desktop-keyboard-shortcuts')
         about.run()
         about.destroy()
 
@@ -508,4 +506,3 @@ class Screenkey(gtk.Window):
             os._exit(0)
 
         os.setsid()
-

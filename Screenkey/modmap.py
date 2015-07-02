@@ -16,13 +16,16 @@
 import re
 import subprocess
 
+
 def cmd_keymap_table():
     return subprocess.Popen(
-           ['xmodmap','-pk'], stdout=subprocess.PIPE).communicate()[0]
+        ['xmodmap', '-pk'], stdout=subprocess.PIPE).communicate()[0]
+
 
 def cmd_modifier_map():
     return subprocess.Popen(
-            ['xmodmap','-pm'], stdout=subprocess.PIPE).communicate()[0]
+        ['xmodmap', '-pm'], stdout=subprocess.PIPE).communicate()[0]
+
 
 def get_keymap_table():
     keymap = {}
@@ -49,6 +52,7 @@ def get_keymap_table():
 
     return keymap
 
+
 def get_modifier_map():
     modifiers = []
 
@@ -68,6 +72,7 @@ def get_modifier_map():
 
     return modifiers
 
+
 def keysym_to_unicode(keysym):
     if keysym in mapping:
         return unichr(mapping[keysym])
@@ -76,6 +81,7 @@ def keysym_to_unicode(keysym):
             return unichr(keysym)
         except ValueError:
             return u'\x00'
+
 
 mapping = {
     0x01a1: 0x0104,

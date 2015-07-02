@@ -3,12 +3,12 @@
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
-# 
+#
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
-# 
+#
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
@@ -57,7 +57,7 @@ class Screenkey(gtk.Window):
         MODE_NORMAL:_('Normal'),
     }
 
-    STATE_FILE = os.path.join(glib.get_user_cache_dir(), 
+    STATE_FILE = os.path.join(glib.get_user_cache_dir(),
                               'screenkey.dat')
 
     def __init__(self, logger, nodetach, nohide, bg, fg, nosudo, window_id):
@@ -95,7 +95,7 @@ class Screenkey(gtk.Window):
         self.pos_x = 0
         self.pos_y = 0
 
-        gobject.signal_new("text-changed", gtk.Label, 
+        gobject.signal_new("text-changed", gtk.Label,
                         gobject.SIGNAL_RUN_FIRST, gobject.TYPE_NONE, ())
         self.label = gtk.Label()
         self.label.set_justify(gtk.JUSTIFY_RIGHT)
@@ -104,8 +104,8 @@ class Screenkey(gtk.Window):
         self.label.show()
         self.add(self.label)
 
-        self.screen_width = gtk.gdk.screen_width()   
-        self.screen_height = gtk.gdk.screen_height() 
+        self.screen_width = gtk.gdk.screen_width()
+        self.screen_height = gtk.gdk.screen_height()
 
         self.set_gravity(gtk.gdk.GRAVITY_CENTER)
 
@@ -118,12 +118,12 @@ class Screenkey(gtk.Window):
             window_width, window_height = self.set_window_size_of_other_win(
                     other_win_pos, self.options['size'])
 
-            self.set_xy_position_of_other_win(other_win_pos, self.options['position'], 
+            self.set_xy_position_of_other_win(other_win_pos, self.options['position'],
                     window_width, window_height)
 
         self.nosudo = nosudo
 
-        self.listenkbd = ListenKbd(self.label, logger=self.logger, 
+        self.listenkbd = ListenKbd(self.label, logger=self.logger,
                                    mode=self.options['mode'],
                                    nosudo=self.nosudo)
         self.listenkbd.start()
@@ -160,8 +160,8 @@ class Screenkey(gtk.Window):
 
         try:
             import appindicator
-            self.systray = appindicator.Indicator(APP_NAME, 
-                           'indicator-messages', 
+            self.systray = appindicator.Indicator(APP_NAME,
+                           'indicator-messages',
                             appindicator.CATEGORY_APPLICATION_STATUS)
             self.systray.set_status(appindicator.STATUS_ACTIVE)
             self.systray.set_attention_icon("indicator-messages-new")
@@ -173,7 +173,7 @@ class Screenkey(gtk.Window):
             self.systray = gtk.StatusIcon()
             self.systray.set_from_icon_name(
                     "preferences-desktop-keyboard-shortcuts")
-            self.systray.connect("popup-menu", 
+            self.systray.connect("popup-menu",
                     self.on_statusicon_popup, menu)
             self.logger.debug("Using StatusIcon.")
 
@@ -203,7 +203,7 @@ class Screenkey(gtk.Window):
             except:
                 f.close()
         except IOError:
-            self.logger.debug("file %s does not exists." % 
+            self.logger.debug("file %s does not exists." %
                               self.STATE_FILE)
         return options
 
@@ -269,7 +269,7 @@ class Screenkey(gtk.Window):
         if setting == POS_CENTER:
             self.move(0, self.screen_height / 2)
         if setting == POS_BOTTOM:
-            self.move(window_pos['x']+window_pos['width']-window_width, 
+            self.move(window_pos['x']+window_pos['width']-window_width,
                     int(window_pos['y'] + window_pos['height'] - \
                             window_height*5 - window_pos['height']*0.05))
         if setting == POS_KEEP:
@@ -291,7 +291,7 @@ class Screenkey(gtk.Window):
         if button == 3:
             if data:
                 data.show()
-                data.popup(None, None, gtk.status_icon_position_menu, 
+                data.popup(None, None, gtk.status_icon_position_menu,
                            3, timestamp, widget)
 
     def on_label_change(self, widget, data=None):
@@ -316,14 +316,14 @@ class Screenkey(gtk.Window):
 
     def on_change_mode(self, mode):
         self.listenkbd.stop()
-        self.listenkbd = ListenKbd(self.label, logger=self.logger, 
+        self.listenkbd = ListenKbd(self.label, logger=self.logger,
                                    mode=mode, nosudo=self.nosudo)
         self.listenkbd.start()
 
     def on_show_keys(self, widget, data=None):
         if widget.get_active():
             self.logger.debug("Screenkey enabled.")
-            self.listenkbd = ListenKbd(self.label, logger=self.logger, 
+            self.listenkbd = ListenKbd(self.label, logger=self.logger,
                                        mode=self.options['mode'],
                                        nosudo=self.nosudo)
             self.listenkbd.start()
@@ -354,8 +354,8 @@ class Screenkey(gtk.Window):
         self.label.set_attributes(attr)
 
     def on_preferences_dialog(self, widget, data=None):
-        prefs = gtk.Dialog(APP_NAME, None, 
-                    gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT, 
+        prefs = gtk.Dialog(APP_NAME, None,
+                    gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT,
                     (gtk.STOCK_CLOSE, gtk.RESPONSE_CLOSE))
 
         def on_sb_time_changed(widget, data=None):
@@ -401,11 +401,11 @@ class Screenkey(gtk.Window):
         sb_time.set_update_policy(gtk.UPDATE_IF_VALID)
         sb_time.set_value(self.options['timeout'])
         sb_time.connect("value-changed", on_sb_time_changed)
-        hbox_time.pack_start(lbl_time1, expand=False, 
+        hbox_time.pack_start(lbl_time1, expand=False,
                              fill=False, padding=6)
-        hbox_time.pack_start(sb_time, expand=False, 
+        hbox_time.pack_start(sb_time, expand=False,
                              fill=False, padding=4)
-        hbox_time.pack_start(lbl_time2, expand=False, 
+        hbox_time.pack_start(lbl_time2, expand=False,
                              fill=False, padding=4)
         frm_time.add(hbox_time)
         frm_time.show_all()
@@ -426,9 +426,9 @@ class Screenkey(gtk.Window):
         cbox_positions.set_active(self.options['position'])
         cbox_positions.connect("changed", on_cbox_changed)
 
-        hbox1_aspect.pack_start(lbl_positions, expand=False, 
+        hbox1_aspect.pack_start(lbl_positions, expand=False,
                                 fill=False, padding=6)
-        hbox1_aspect.pack_start(cbox_positions, expand=False, 
+        hbox1_aspect.pack_start(cbox_positions, expand=False,
                                 fill=False, padding=4)
 
         hbox2_aspect = gtk.HBox()
@@ -441,9 +441,9 @@ class Screenkey(gtk.Window):
         cbox_sizes.set_active(self.options['size'])
         cbox_sizes.connect("changed", on_cbox_sizes_changed)
 
-        hbox2_aspect.pack_start(lbl_sizes, expand=False, 
+        hbox2_aspect.pack_start(lbl_sizes, expand=False,
                                 fill=False, padding=6)
-        hbox2_aspect.pack_start(cbox_sizes, expand=False, 
+        hbox2_aspect.pack_start(cbox_sizes, expand=False,
                                 fill=False, padding=4)
 
         vbox_aspect.pack_start(hbox1_aspect)
@@ -462,9 +462,9 @@ class Screenkey(gtk.Window):
             cbox_modes.insert_text(key, value)
         cbox_modes.set_active(self.options['mode'])
         cbox_modes.connect("changed", on_cbox_modes_changed)
-        hbox_kbd.pack_start(lbl_kbd, expand=False, 
+        hbox_kbd.pack_start(lbl_kbd, expand=False,
                             fill=False, padding=6)
-        hbox_kbd.pack_start(cbox_modes, expand=False, 
+        hbox_kbd.pack_start(cbox_modes, expand=False,
                             fill=False, padding=4)
         frm_kbd.add(hbox_kbd)
 

@@ -4,12 +4,12 @@
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
-# 
+#
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
-# 
+#
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
@@ -33,10 +33,10 @@ gtk.gdk.threads_init()
 
 def Main():
     parser = OptionParser(description=APP_DESC, version=VERSION)
-    parser.add_option("--no-detach", action="store_true", 
-        dest="nodetach", default=False, 
+    parser.add_option("--no-detach", action="store_true",
+        dest="nodetach", default=False,
         help=_("do not detach from the parent"))
-    parser.add_option("-d", "--debug", action="store_true", 
+    parser.add_option("-d", "--debug", action="store_true",
         dest="debug", default=False, help=_("show debug information"))
     parser.add_option("-n", "--no-hide", action="store_true",
         dest="nohide", default=False, help=_("do not hide"))
@@ -56,7 +56,7 @@ def Main():
             # Send debug messages to standard output
             logfile = None
         else:
-            logfile = os.path.join(os.path.expanduser('~'), 
+            logfile = os.path.join(os.path.expanduser('~'),
                                    '.screenkey.log')
             username = os.environ.get('SUDO_USER')
             if username:

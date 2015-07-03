@@ -26,52 +26,53 @@ MODE_RAW = 0
 MODE_NORMAL = 1
 
 REPLACE_KEYS = {
-    'XK_Escape':_('Esc'),
-    'XK_Tab':u'\u21B9',
-    'XK_Return':u'\u23CE',
-    'XK_Space':u'',
-    'XK_Caps_Lock':_('Caps'),
-    'XK_F1':u'F1',
-    'XK_F2':u'F2',
-    'XK_F3':u'F3',
-    'XK_F4':u'F4',
-    'XK_F5':u'F5',
-    'XK_F6':u'F6',
-    'XK_F7':u'F7',
-    'XK_F8':u'F8',
-    'XK_F9':u'F9',
-    'XK_F10':u'F10',
-    'XK_F11':u'F11',
-    'XK_F12':u'F12',
-    'XK_Home':_('Home'),
-    'XK_Up':u'\u2191',
-    'XK_Page_Up':_('PgUp'),
-    'XK_Left':u'\u2190',
-    'XK_Right':u'\u2192',
-    'XK_End':_('End'),
-    'XK_Down':u'\u2193',
-    'XK_Next':_('PgDn'),
-    'XK_Insert':_('Ins'),
-    'XK_BackSpace':_(u'\u21d0'),
-    'XK_Delete':_('Del'),
-    'XK_KP_Home':u'(7)',
-    'XK_KP_Up':u'(8)',
-    'XK_KP_Prior':u'(9)',
-    'XK_KP_Left':u'(4)',
-    'XK_KP_Right':u'(6)',
-    'XK_KP_End':u'(1)',
-    'XK_KP_Down':u'(2)',
-    'XK_KP_Page_Down':u'(3)',
-    'XK_KP_Begin':u'(5)',
-    'XK_KP_Insert':u'(0)',
-    'XK_KP_Delete':u'(.)',
-    'XK_KP_Add':u'(+)',
-    'XK_KP_Subtract':u'(-)',
-    'XK_KP_Multiply':u'(*)',
-    'XK_KP_Divide':u'(/)',
-    'XK_Num_Lock':u'NumLock',
-    'XK_KP_Enter':u'\u23CE',
+    'XK_Escape': _('Esc'),
+    'XK_Tab': u'\u21B9',
+    'XK_Return': u'\u23CE',
+    'XK_Space': u'',
+    'XK_Caps_Lock': _('Caps'),
+    'XK_F1': u'F1',
+    'XK_F2': u'F2',
+    'XK_F3': u'F3',
+    'XK_F4': u'F4',
+    'XK_F5': u'F5',
+    'XK_F6': u'F6',
+    'XK_F7': u'F7',
+    'XK_F8': u'F8',
+    'XK_F9': u'F9',
+    'XK_F10': u'F10',
+    'XK_F11': u'F11',
+    'XK_F12': u'F12',
+    'XK_Home': _('Home'),
+    'XK_Up': u'\u2191',
+    'XK_Page_Up': _('PgUp'),
+    'XK_Left': u'\u2190',
+    'XK_Right': u'\u2192',
+    'XK_End': _('End'),
+    'XK_Down': u'\u2193',
+    'XK_Next': _('PgDn'),
+    'XK_Insert': _('Ins'),
+    'XK_BackSpace': _(u'\u21d0'),
+    'XK_Delete': _('Del'),
+    'XK_KP_Home': u'(7)',
+    'XK_KP_Up': u'(8)',
+    'XK_KP_Prior': u'(9)',
+    'XK_KP_Left': u'(4)',
+    'XK_KP_Right': u'(6)',
+    'XK_KP_End': u'(1)',
+    'XK_KP_Down': u'(2)',
+    'XK_KP_Page_Down': u'(3)',
+    'XK_KP_Begin': u'(5)',
+    'XK_KP_Insert': u'(0)',
+    'XK_KP_Delete': u'(.)',
+    'XK_KP_Add': u'(+)',
+    'XK_KP_Subtract': u'(-)',
+    'XK_KP_Multiply': u'(*)',
+    'XK_KP_Divide': u'(/)',
+    'XK_Num_Lock': u'NumLock',
+    'XK_KP_Enter': u'\u23CE',
 }
+
 
 class ListenKbd(threading.Thread):
     # Add in a shortcut to disable
@@ -93,7 +94,7 @@ class ListenKbd(threading.Thread):
             'alt': False,
             'capslock': False,
             'meta': False,
-            'super':False
+            'super': False
             }
 
         self.logger.debug("Thread created")
@@ -109,19 +110,19 @@ class ListenKbd(threading.Thread):
             sys.exit(1)
 
         self.ctx = self.record_dpy.record_create_context(
-                0,
-                [record.AllClients],
-                [{
-                        'core_requests': (0, 0),
-                        'core_replies': (0, 0),
-                        'ext_requests': (0, 0, 0, 0),
-                        'ext_replies': (0, 0, 0, 0),
-                        'delivered_events': (0, 0),
-                        'device_events': (X.KeyPress, X.KeyRelease),
-                        'errors': (0, 0),
-                        'client_started': False,
-                        'client_died': False,
-                }])
+            0,
+            [record.AllClients],
+            [{
+                'core_requests': (0, 0),
+                'core_replies': (0, 0),
+                'ext_requests': (0, 0, 0, 0),
+                'ext_replies': (0, 0, 0, 0),
+                'delivered_events': (0, 0),
+                'device_events': (X.KeyPress, X.KeyRelease),
+                'errors': (0, 0),
+                'client_started': False,
+                'client_died': False,
+            }])
 
     def run(self):
         self.logger.debug("Thread started.")
@@ -134,9 +135,9 @@ class ListenKbd(threading.Thread):
         return ""
 
     def replace_xk_key(self, key, keysym):
-        if key == '\x00':
-            return ''
         print(key, keysym)
+        if key == u'\x00' or key == '\x00':
+            return ''
         for name in dir(XK):
             if name[:3] == "XK_" and getattr(XK, name) == keysym:
                 if name in REPLACE_KEYS:
@@ -144,14 +145,14 @@ class ListenKbd(threading.Thread):
 
     def update_text(self, string=None):
         gtk.gdk.threads_enter()
-        if not string is None:
+        if string is not None:
             # TODO: make this configurable
             if string.strip() == 'Ctrl+F1':
                 if self._disabled:
-                    self._disabled=False
+                    self._disabled = False
                     self.text = "[ENABLED]"
                 else:
-                    self._disabled=True
+                    self._disabled = True
                     self.text = "[DISABLED]"
             else:
                 self.text = "%s%s" % (self.label.get_text(), string)
@@ -166,14 +167,14 @@ class ListenKbd(threading.Thread):
             self.label.emit("text-changed")
 
     def key_press(self, reply):
-
         # FIXME:
         # This is not the most efficient way to detect the
         # use of sudo/gksudo but it works.
         if not self.nosudo:
-            sudo_is_running = subprocess.call(['ps', '-C', 'sudo'],
-                        stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
-            if not sudo_is_running:
+            sudo_is_running = 0 == subprocess.call(
+                ['ps', '-C', 'sudo'],
+                stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+            if sudo_is_running:
                 return
 
         if reply.category != record.FromServer:
@@ -189,15 +190,15 @@ class ListenKbd(threading.Thread):
         data = reply.data
         key = []
         while len(data):
-            event, data = rq.EventField(None).parse_binary_value(data,
-                                    self.record_dpy.display, None, None)
+            event, data = rq.EventField(None).parse_binary_value(
+                data, self.record_dpy.display, None, None)
             if event.type in [X.KeyPress, X.KeyRelease]:
                 if self.mode == MODE_NORMAL:
                     key.append(self.key_normal_mode(event))
                 if self.mode == MODE_RAW:
                     key.append(self.key_raw_mode(event))
         if any(key):
-          self.update_text(''.join(k for k in key if k))
+            self.update_text(''.join(k for k in key if k))
 
     def key_normal_mode(self, event):
         key = ''
@@ -205,33 +206,32 @@ class ListenKbd(threading.Thread):
         keysym = self.local_dpy.keycode_to_keysym(event.detail, 0)
 
         if event.detail in self.keymap:
-            key_normal_1, key_shift_1, \
-            key_normal_2, key_shift_2, \
-            key_dead, key_deadshift = self.keymap[event.detail]
+            (key_normal_1, key_shift_1,
+             key_normal_2, key_shift_2,
+             key_dead, key_deadshift) = self.keymap[event.detail]
             if event.state & 1 << 13 != 0:
                 key_normal = key_normal_2
                 key_shift = key_shift_2
             else:
                 key_normal = key_normal_1
                 key_shift = key_shift_1
-            self.logger.debug("Key %s(keycode) %s. Symbols %s" %
-                (event.detail,
-                 event.type == X.KeyPress and "pressed" or "released",
-                 self.keymap[event.detail])
-                )
+            self.logger.debug("Key %s(keycode) %s. Symbols %s" % (
+                event.detail,
+                event.type == X.KeyPress and "pressed" or "released",
+                self.keymap[event.detail]))
         else:
             self.logger.debug('No mapping for scan_code %d' % event.detail)
             return
 
         masks = {
-            1<<0: 'shift',
-            1<<1: 'lock',
-            1<<2: 'ctrl',
-            1<<3: 'alt',
-            1<<4: 'mod2',
-            1<<5: 'mod3',
-            1<<6: 'super',
-            1<<7: 'meta'
+            1 << 0: 'shift',
+            1 << 1: 'lock',
+            1 << 2: 'ctrl',
+            1 << 3: 'alt',
+            1 << 4: 'mod2',
+            1 << 5: 'mod3',
+            1 << 6: 'super',
+            1 << 7: 'meta'
         }
         for k in masks:
             if k & event.state:
@@ -251,11 +251,12 @@ class ListenKbd(threading.Thread):
                     mod = mod + _("Super+")
 
                 if self.cmd_keys['shift']:
-                    if key_shift == key_normal or key_normal == u'\x00' or key_shift == u'\x00':
+                    if (key_shift == key_normal or key_normal == u'\x00'
+                            or key_shift == u'\x00'):
                         mod = mod + _("Shift+")
                     key = key_shift
-                if self.cmd_keys['capslock'] \
-                    and ord(key_normal) in range(97,123):
+                if (self.cmd_keys['capslock'] and
+                        ord(key_normal) in range(97, 123)):
                     key = key_shift
                 if self.cmd_keys['meta']:
                     key = key_dead
@@ -275,7 +276,7 @@ class ListenKbd(threading.Thread):
                     key = u'\u2623'
 
                 string = self.replace_xk_key(key, keysym)
-                if string:
+                if string is not None:
                     key = string
 
                 if mod != '':
@@ -314,4 +315,3 @@ class ListenKbd(threading.Thread):
         self.local_dpy.flush()
         self.record_dpy.record_free_context(self.ctx)
         self.logger.debug("Thread stopped.")
-

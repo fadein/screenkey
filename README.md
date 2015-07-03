@@ -16,7 +16,7 @@ I've made significant changes, including:
   * `-n, --no-hide` do not hide window after timeout, hide only text (make it
     usable with tile managers, for example, with i3, which can not have
     unfocusable windows);
-* instead of removing text on `backspace` symbol `⇐` will be added; it was
+* instead of removing text on `backspace` symbol `⌫` will be added; it was
   broken anyway, so it will happily erase `Ctrl+...` and other text;
 * space is changed to visible character: `␣`;
 * supported second keyboard layout, so not only ASCII letters can be recorded;

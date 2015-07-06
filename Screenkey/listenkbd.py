@@ -265,7 +265,7 @@ class ListenKbd(threading.Thread):
                 if event.detail == 23:
                     self.detached = True
                 if event.detail == 22:
-                    key = u'\u21D0'
+                    key = u'\u232B'
                 if event.detail == 65:
                     key = u'\u2423'
                 if event.detail == 66:

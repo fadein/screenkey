@@ -17,7 +17,7 @@ import sys
 import subprocess
 import modmap
 import gtk
-import time
+import datetime
 
 from Xlib import X, XK, display
 from Xlib.ext import record
@@ -143,7 +143,9 @@ class ListenKbd(threading.Thread):
                 if name.upper() in REPLACE_KEYS:
                     return REPLACE_KEYS[name]
 
-    def update_text(self, string=None):
+    def update_text(self, string=None, event=None):
+        if event.type == X.KeyRelease:
+            return
         gtk.gdk.threads_enter()
         if string is not None:
             # TODO: make this configurable
@@ -194,11 +196,11 @@ class ListenKbd(threading.Thread):
                 data, self.record_dpy.display, None, None)
             if event.type in [X.KeyPress, X.KeyRelease]:
                 if self.mode == MODE_NORMAL:
-                    key.append(self.key_normal_mode(event))
+                    key = self.key_normal_mode(event)
                 if self.mode == MODE_RAW:
-                    key.append(self.key_raw_mode(event))
-        if any(key):
-            self.update_text(''.join(k for k in key if k))
+                    key = self.key_raw_mode(event)
+                if key:
+                    self.update_text(key, event)
 
     def key_normal_mode(self, event):
         key = ''
@@ -241,64 +243,61 @@ class ListenKbd(threading.Thread):
         if event.detail in self.modifiers:
             return
         else:
-            if event.type == X.KeyPress:
-                key = key_normal
-                if self.cmd_keys['ctrl']:
-                    mod = mod + _("Ctrl+")
-                if self.cmd_keys['alt']:
-                    mod = mod + _("Alt+")
-                if self.cmd_keys['super']:
-                    mod = mod + _("Super+")
+            key = key_normal
+            if self.cmd_keys['ctrl']:
+                mod = mod + _("Ctrl+")
+            if self.cmd_keys['alt']:
+                mod = mod + _("Alt+")
+            if self.cmd_keys['super']:
+                mod = mod + _("Super+")
 
-                if self.cmd_keys['shift']:
-                    if (key_shift == key_normal or key_normal == u'\x00'
-                            or key_shift == u'\x00'):
-                        mod = mod + _("Shift+")
-                    key = key_shift
-                if (self.cmd_keys['capslock'] and
-                        ord(key_normal) in range(97, 123)):
-                    key = key_shift
-                if self.cmd_keys['meta']:
-                    key = key_dead
-                if self.cmd_keys['shift'] and self.cmd_keys['meta']:
-                    key = key_deadshift
-                if event.detail == 23:
-                    self.detached = True
-                if event.detail == 22:
-                    key = u'\u232B'
-                if event.detail == 65:
-                    key = u'\u2423'
-                if event.detail == 66:
-                    self.detached = True
-                    key = u'\u2328'
-                if event.detail == 108:
-                    self.detached = True
-                    key = u'\u2623'
+            if self.cmd_keys['shift']:
+                if (key_shift == key_normal or key_normal == u'\x00'
+                        or key_shift == u'\x00'):
+                    mod = mod + _("Shift+")
+                key = key_shift
+            if (self.cmd_keys['capslock'] and
+                    ord(key_normal) in range(97, 123)):
+                key = key_shift
+            if self.cmd_keys['meta']:
+                key = key_dead
+            if self.cmd_keys['shift'] and self.cmd_keys['meta']:
+                key = key_deadshift
+            if event.detail == 23:
+                self.detached = True
+            if event.detail == 22:
+                key = u'\u232B'
+            if event.detail == 65:
+                key = u'\u2423'
+            if event.detail == 66:
+                self.detached = True
+                key = u'\u2328'
+            if event.detail == 108:
+                self.detached = True
+                key = u'\u2623'
 
-                string = self.replace_xk_key(key, keysym)
+            string = self.replace_xk_key(key, keysym)
 
-                if string is not None:
-                    key = string
+            if string is not None:
+                key = string
 
-                if mod != '':
-                    key = mod + key
+            if mod != '':
+                key = mod + key
 
-                detached = self.detached
-                self.detached = False
-                if len(key) > 1:
-                    self.detached = True
-                if event.detail == 66:
-                    self.detached = True
-                if event.detail == 23:
-                    self.detached = True
+            detached = self.detached
+            self.detached = False
+            if len(key) > 1:
+                self.detached = True
+            if event.detail == 66:
+                self.detached = True
+            if event.detail == 23:
+                self.detached = True
 
-                if detached or len(key) > 1:
-                    key = " " + key
+            if detached or len(key) > 1:
+                key = " " + key
 
-                if event.detail == 65:
-                    key += u'\u200A'
-            else:
-                return
+            if event.detail == 65:
+                key += u'\u200A'
 
         return key
 
@@ -366,10 +365,26 @@ class ListenKbd_Logger(ListenKbd):
     def start(self):
         self.record_dpy.record_enable_context(self.ctx, self.key_press)
 
-    def update_text(self, string):
-        print("{:<013}\t{}".format(time.time(), string.strip()))
+    def update_text(self, string, event):
+        if event.sequence_number == 1:
+            return
+        if event.type == X.KeyRelease:
+            event_type = 'release'
+        else:
+            event_type = 'press'
+        print(
+            "{}\t{}\t{}".format(
+                datetime.datetime.now().strftime("%d/%m/%YT%H:%M:%S.%f"),
+                event_type,
+                string.strip(),
+            )
+        )
 
     def replace_xk_key(self, key, keysym):
+        if key == u'\u2623':
+            return 'Lvl5'
+        if key == u'\uff7e':
+            return 'Layout'
         if key == u'\x00' or key == '\x00':
             return ''
         for name in dir(XK):

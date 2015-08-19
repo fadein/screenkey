@@ -28,6 +28,7 @@ gettext.install('screenkey', unicode=True)
 
 from Screenkey import APP_NAME, APP_DESC, VERSION
 from Screenkey.screenkey import Screenkey
+from Screenkey.listenkbd import ListenKbd_Logger, MODE_NORMAL
 
 
 def main():
@@ -56,6 +57,9 @@ def main():
     parser.add_option(
         "-w", "--window",
         dest="window_id", default=0, help=_("align to other window"))
+    parser.add_option(
+        "--key-logger", action="store_true",
+        default=False, help=_("keylogger mode: windowless, print to stdout"))
     (options, args) = parser.parse_args()
 
     if options.debug:
@@ -77,19 +81,25 @@ def main():
 
     gtk.gdk.threads_init()
 
-    s = Screenkey(
-        logger=logger,
-        nodetach=options.nodetach,
-        nohide=options.nohide,
-        bg=options.bg, fg=options.fg,
-        nosudo=options.nosudo,
-        window_id=options.window_id)
-    try:
-        gtk.main()
-    finally:
-        # listenkbd thread do not terminate due to bug in Xlib implementation
-        if threading.active_count() > 1:
-            os.system('kill %d' % (os.getpid()))
+    if options.key_logger:
+        listenkbd = ListenKbd_Logger(logger=logger,
+                                   mode=MODE_NORMAL,
+                                   nosudo=options.nosudo)
+        listenkbd.start()
+    else:
+        Screenkey(
+            logger=logger,
+            nodetach=options.nodetach,
+            nohide=options.nohide,
+            bg=options.bg, fg=options.fg,
+            nosudo=options.nosudo,
+            window_id=options.window_id)
+        try:
+            gtk.main()
+        finally:
+            # listenkbd thread do not terminate due to bug in Xlib implementation
+            if threading.active_count() > 1:
+                os.system('kill %d' % (os.getpid()))
 
 if __name__ == "__main__":
     main()

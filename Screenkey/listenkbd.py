@@ -17,6 +17,7 @@ import sys
 import subprocess
 import modmap
 import gtk
+import time
 
 from Xlib import X, XK, display
 from Xlib.ext import record
@@ -26,11 +27,11 @@ MODE_RAW = 0
 MODE_NORMAL = 1
 
 REPLACE_KEYS = {
-    'XK_Escape': _('Esc'),
-    'XK_Tab': u'\u21B9',
-    'XK_Return': u'\u23CE',
-    'XK_Space': u'',
-    'XK_Caps_Lock': _('Caps'),
+    'XK_ESCAPE': _('Esc'),
+    'XK_TAB': u'\u21B9',
+    'XK_RETURN': u'\u23CE',
+    'XK_SPACE': u'',
+    'XK_CAPS_LOCK': _('Caps'),
     'XK_F1': u'F1',
     'XK_F2': u'F2',
     'XK_F3': u'F3',
@@ -43,34 +44,34 @@ REPLACE_KEYS = {
     'XK_F10': u'F10',
     'XK_F11': u'F11',
     'XK_F12': u'F12',
-    'XK_Home': _('Home'),
-    'XK_Up': u'\u2191',
-    'XK_Page_Up': _('PgUp'),
-    'XK_Left': u'\u2190',
-    'XK_Right': u'\u2192',
-    'XK_End': _('End'),
-    'XK_Down': u'\u2193',
-    'XK_Next': _('PgDn'),
-    'XK_Insert': _('Ins'),
-    'XK_BackSpace': _(u'\u232B'),
-    'XK_Delete': _('Del'),
-    'XK_KP_Home': u'(7)',
-    'XK_KP_Up': u'(8)',
-    'XK_KP_Prior': u'(9)',
-    'XK_KP_Left': u'(4)',
-    'XK_KP_Right': u'(6)',
-    'XK_KP_End': u'(1)',
-    'XK_KP_Down': u'(2)',
-    'XK_KP_Page_Down': u'(3)',
-    'XK_KP_Begin': u'(5)',
-    'XK_KP_Insert': u'(0)',
-    'XK_KP_Delete': u'(.)',
-    'XK_KP_Add': u'(+)',
-    'XK_KP_Subtract': u'(-)',
-    'XK_KP_Multiply': u'(*)',
-    'XK_KP_Divide': u'(/)',
-    'XK_Num_Lock': u'NumLock',
-    'XK_KP_Enter': u'\u23CE',
+    'XK_HOME': _('Home'),
+    'XK_UP': u'\u2191',
+    'XK_PAGE_UP': _('PgUp'),
+    'XK_LEFT': u'\u2190',
+    'XK_RIGHT': u'\u2192',
+    'XK_END': _('End'),
+    'XK_DOWN': u'\u2193',
+    'XK_NEXT': _('PgDn'),
+    'XK_INSERT': _('Ins'),
+    'XK_BACKSPACE': _(u'\u232B'),
+    'XK_DELETE': _('Del'),
+    'XK_KP_HOME': u'(7)',
+    'XK_KP_UP': u'(8)',
+    'XK_KP_PRIOR': u'(9)',
+    'XK_KP_LEFT': u'(4)',
+    'XK_KP_RIGHT': u'(6)',
+    'XK_KP_END': u'(1)',
+    'XK_KP_DOWN': u'(2)',
+    'XK_KP_PAGE_DOWN': u'(3)',
+    'XK_KP_BEGIN': u'(5)',
+    'XK_KP_INSERT': u'(0)',
+    'XK_KP_DELETE': u'(.)',
+    'XK_KP_ADD': u'(+)',
+    'XK_KP_SUBTRACT': u'(-)',
+    'XK_KP_MULTIPLY': u'(*)',
+    'XK_KP_DIVIDE': u'(/)',
+    'XK_NUM_LOCK': u'NumLock',
+    'XK_KP_ENTER': u'\u23CE',
 }
 
 
@@ -135,12 +136,11 @@ class ListenKbd(threading.Thread):
         return ""
 
     def replace_xk_key(self, key, keysym):
-        print(key, keysym)
         if key == u'\x00' or key == '\x00':
             return ''
         for name in dir(XK):
             if name[:3] == "XK_" and getattr(XK, name) == keysym:
-                if name in REPLACE_KEYS:
+                if name.upper() in REPLACE_KEYS:
                     return REPLACE_KEYS[name]
 
     def update_text(self, string=None):
@@ -276,6 +276,7 @@ class ListenKbd(threading.Thread):
                     key = u'\u2623'
 
                 string = self.replace_xk_key(key, keysym)
+
                 if string is not None:
                     key = string
 
@@ -315,3 +316,63 @@ class ListenKbd(threading.Thread):
         self.local_dpy.flush()
         self.record_dpy.record_free_context(self.ctx)
         self.logger.debug("Thread stopped.")
+
+
+class ListenKbd_Logger(ListenKbd):
+    def __init__(self, logger, mode, nosudo):
+        self.mode = mode
+        self.logger = logger
+        self.text = ""
+        self.command = None
+        self.shift = None
+        self.detached = False
+        self.nosudo = nosudo
+        self.cmd_keys = {
+            'shift': False,
+            'ctrl': False,
+            'alt': False,
+            'capslock': False,
+            'meta': False,
+            'super': False
+        }
+
+
+        self.keymap = modmap.get_keymap_table()
+        self.modifiers = modmap.get_modifier_map()
+
+        self.local_dpy = display.Display()
+        self.record_dpy = display.Display()
+
+        if not self.record_dpy.has_extension("RECORD"):
+            self.logger.error("RECORD extension not found.")
+            print "RECORD extension not found"
+            sys.exit(1)
+
+        self.ctx = self.record_dpy.record_create_context(
+            0,
+            [record.AllClients],
+            [{
+                'core_requests': (0, 0),
+                'core_replies': (0, 0),
+                'ext_requests': (0, 0, 0, 0),
+                'ext_replies': (0, 0, 0, 0),
+                'delivered_events': (0, 0),
+                'device_events': (X.KeyPress, X.KeyRelease),
+                'errors': (0, 0),
+                'client_started': False,
+                'client_died': False,
+            }])
+
+    def start(self):
+        self.record_dpy.record_enable_context(self.ctx, self.key_press)
+
+    def update_text(self, string):
+        print("{:<013}\t{}".format(time.time(), string.strip()))
+
+    def replace_xk_key(self, key, keysym):
+        if key == u'\x00' or key == '\x00':
+            return ''
+        for name in dir(XK):
+            if name[:3] == "XK_" and getattr(XK, name) == keysym:
+                if name.upper() in REPLACE_KEYS:
+                    return name[3:]

@@ -30,7 +30,7 @@ REPLACE_KEYS = {
     'XK_ESCAPE': _('Esc'),
     'XK_TAB': u'\u21B9',
     'XK_RETURN': u'\u23CE',
-    'XK_SPACE': u'',
+    'XK_SPACE': u' ',
     'XK_CAPS_LOCK': _('Caps'),
     'XK_F1': u'F1',
     'XK_F2': u'F2',
@@ -141,7 +141,7 @@ class ListenKbd(threading.Thread):
         for name in dir(XK):
             if name[:3] == "XK_" and getattr(XK, name) == keysym:
                 if name.upper() in REPLACE_KEYS:
-                    return REPLACE_KEYS[name]
+                    return REPLACE_KEYS[name.upper()]
 
     def update_text(self, string=None, event=None):
         if event.type == X.KeyRelease:

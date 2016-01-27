@@ -60,6 +60,10 @@ def main():
     parser.add_option(
         "--key-logger", action="store_true",
         default=False, help=_("keylogger mode: windowless, print to stdout"))
+    parser.add_option(
+        "-t", "--timeout", action="store",
+        dest="timeout", default=3.0, help=_("how long the display window stays visible"))
+
     (options, args) = parser.parse_args()
 
     if options.debug:
@@ -93,7 +97,8 @@ def main():
             nohide=options.nohide,
             bg=options.bg, fg=options.fg,
             nosudo=options.nosudo,
-            window_id=options.window_id)
+            window_id=options.window_id,
+			timeout=options.timeout)
         try:
             gtk.main()
         finally:

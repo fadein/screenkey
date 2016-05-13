@@ -89,7 +89,7 @@ class Screenkey(gtk.Window):
         self.set_position(gtk.WIN_POS_CENTER)
         bgcolor = gtk.gdk.color_parse(bg)
         self.modify_bg(gtk.STATE_NORMAL, bgcolor)
-        self.set_opacity(0.7)
+        self.set_opacity(1.0)
 
         self.fg = fg
 
@@ -104,6 +104,14 @@ class Screenkey(gtk.Window):
         self.label.connect("text-changed", self.on_label_change)
         self.label.show()
         self.add(self.label)
+
+        # this bit doesn't have any noticable effect on the font :(
+        fontdesc = self.label.get_pango_context().get_font_description()
+        le_size = fontdesc.get_size()
+        print "font size ", le_size
+        le_size = le_size * 2
+        print "font size ", le_size
+        self.label.get_pango_context().get_font_description().set_size(le_size)
 
         self.screen_width = gtk.gdk.screen_width()
         self.screen_height = gtk.gdk.screen_height()

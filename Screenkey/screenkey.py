@@ -61,7 +61,7 @@ class Screenkey(gtk.Window):
     STATE_FILE = os.path.join(glib.get_user_cache_dir(),
                               'screenkey.dat')
 
-    def __init__(self, logger, nodetach, nohide, bg, fg, nosudo, window_id, timeout):
+    def __init__(self, logger, nodetach, nohide, bg, fg, nosudo, window_id, timeout, font, fontsize):
         gtk.Window.__init__(self)
         self.timer = None
         self.logger = logger
@@ -73,6 +73,8 @@ class Screenkey(gtk.Window):
                 'position': POS_BOTTOM,
                 'size': SIZE_SMALL,
                 'mode': MODE_NORMAL,
+                'font': font,
+                'fontsize': fontsize,
                 }
 
         if not nodetach:
@@ -104,14 +106,6 @@ class Screenkey(gtk.Window):
         self.label.connect("text-changed", self.on_label_change)
         self.label.show()
         self.add(self.label)
-
-        # this bit doesn't have any noticable effect on the font :(
-        fontdesc = self.label.get_pango_context().get_font_description()
-        le_size = fontdesc.get_size()
-        print "font size ", le_size
-        le_size = le_size * 2
-        print "font size ", le_size
-        self.label.get_pango_context().get_font_description().set_size(le_size)
 
         self.screen_width = gtk.gdk.screen_width()
         self.screen_height = gtk.gdk.screen_height()
@@ -341,9 +335,8 @@ class Screenkey(gtk.Window):
     def on_configure(self, _, event):
         window_height = event.height
         attr = pango.AttrList()
-        attr.change(pango.AttrSize((
-                    50 * window_height / 100) * 1000, 0, -1))
-        attr.change(pango.AttrFamily("DejaVu Sans", 0, -1))
+        attr.change(pango.AttrSize(int(self.options['fontsize']) * 1000, 0, -1))
+        attr.change(pango.AttrFamily(self.options['font'], 0, -1))
         attr.change(pango.AttrWeight(pango.WEIGHT_BOLD, 0, -1))
 
         fgcolor = gtk.gdk.color_parse(self.fg)

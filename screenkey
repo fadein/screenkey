@@ -63,6 +63,12 @@ def main():
     parser.add_option(
         "-t", "--timeout", action="store",
         dest="timeout", default=3.0, help=_("how long the display window stays visible"))
+    parser.add_option(
+        "-f", "--font", action="store",
+        dest="font", default="Deja Vu Sans Mono", help=_("typeface for display"))
+    parser.add_option(
+        "-s", "--size", action="store",
+        dest="fontsize", default=20, help=_("size of typeface"))
 
     (options, args) = parser.parse_args()
 
@@ -98,7 +104,9 @@ def main():
             bg=options.bg, fg=options.fg,
             nosudo=options.nosudo,
             window_id=options.window_id,
-			timeout=options.timeout)
+			timeout=options.timeout,
+            font=options.font,
+            fontsize=options.fontsize)
         try:
             gtk.main()
         finally:

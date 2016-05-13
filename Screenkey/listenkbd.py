@@ -89,6 +89,7 @@ class ListenKbd(threading.Thread):
         self.shift = None
         self.detached = False
         self.nosudo = nosudo
+        self.showing = False
         self.cmd_keys = {
             'shift': False,
             'ctrl': False,
@@ -197,14 +198,24 @@ class ListenKbd(threading.Thread):
             if event.type in [X.KeyPress, X.KeyRelease]:
                 if self.mode == MODE_NORMAL:
                     key = self.key_normal_mode(event)
-                if self.mode == MODE_RAW:
+                elif self.mode == MODE_RAW:
                     key = self.key_raw_mode(event)
+
                 if key:
-                    self.update_text(key, event)
+                    if key == 107: # XK_Print
+                        self.showing = True
+                    elif key == 127: # XK_Pause
+                        self.showing = False
+                    elif self.showing:
+                        self.update_text(key, event)
 
     def key_normal_mode(self, event):
         key = ''
         mod = ''
+
+        if event.detail in [107, 127]:
+            return event.detail
+
         keysym = self.local_dpy.keycode_to_keysym(event.detail, 0)
 
         if event.detail in self.keymap:

@@ -202,10 +202,8 @@ class ListenKbd(threading.Thread):
                     key = self.key_raw_mode(event)
 
                 if key:
-                    if key == 107: # XK_Print
-                        self.showing = True
-                    elif key == 127: # XK_Pause
-                        self.showing = False
+                    if key == 107 and event.type == X.KeyPress: # XK_Print
+                        self.showing = not self.showing
                     elif self.showing:
                         self.update_text(key, event)
 

@@ -79,7 +79,7 @@ class ListenKbd(threading.Thread):
     # Add in a shortcut to disable
     _disabled = False
 
-    def __init__(self, label, logger, mode, nosudo):
+    def __init__(self, label, logger, mode, nosudo, sk):
         threading.Thread.__init__(self)
         self.mode = mode
         self.logger = logger
@@ -125,6 +125,8 @@ class ListenKbd(threading.Thread):
                 'client_started': False,
                 'client_died': False,
             }])
+
+        self.sk = sk
 
     def run(self):
         self.logger.debug("Thread started.")
@@ -204,6 +206,8 @@ class ListenKbd(threading.Thread):
                 if key:
                     if key == 107 and event.type == X.KeyPress: # XK_Print
                         self.showing = not self.showing
+                        if not self.showing:
+                            self.sk.on_timeout()
                     elif self.showing:
                         self.update_text(key, event)
 

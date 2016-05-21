@@ -129,7 +129,7 @@ class Screenkey(gtk.Window):
 
         self.listenkbd = ListenKbd(self.label, logger=self.logger,
                                    mode=self.options['mode'],
-                                   nosudo=self.nosudo)
+                                   nosudo=self.nosudo, sk=self)
         self.listenkbd.start()
 
         menu = gtk.Menu()

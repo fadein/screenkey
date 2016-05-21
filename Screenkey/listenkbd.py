@@ -30,7 +30,7 @@ REPLACE_KEYS = {
     'XK_ESCAPE': _('Esc'),
     'XK_TAB': u'\u21B9',
     'XK_RETURN': u'\u23CE',
-    'XK_SPACE': u' ',
+    'XK_SPACE': u'\u2423',
     'XK_CAPS_LOCK': _('Caps'),
     'XK_F1': u'F1',
     'XK_F2': u'F2',
@@ -308,9 +308,6 @@ class ListenKbd(threading.Thread):
 
             if detached or len(key) > 1:
                 key = " " + key
-
-            if event.detail == 65:
-                key += u'\u200A'
 
         return key
 

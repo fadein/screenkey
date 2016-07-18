@@ -1,7 +1,23 @@
-screenkey
-=========
+fadein's screenkey
+==================
 
-Fork of http://launchpad.net/screenkey
+Fork of https://github.com/seletskiy/screenkey
+which is a fork of http://launchpad.net/screenkey
+
+
+## What I've changed:
+
+*	OSD visibility is controled by a USB Footpedal
+	*	https://learn.adafruit.com/usb-foot-switch/overview
+	*	When footpedal is pressed a PrintScreen (XK_Print) keypress is sent,
+		and another PrintScreen is sent when the footpedal is released.
+	*	As this program is already watching for keypresses, and inasmuch as
+		PrintScreen doesn't need to show up on the display, it serves as a
+		simple toggle between modes.
+*	Space key changed to `␣` (The notes say it should already have been so)
+*	Configurable timeout of OSD window
+
+## Original documentation:
 
 What's up?
 ==========
